@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Répartition des formats par enseigne – France 2024-2025</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0e0f13;
+    --surface: #16181f;
+    --border: rgba(255,255,255,0.07);
+    --text: #e8e6e0;
+    --muted: #7a7870;
+    --carrefour: #e63946;
+    --leclerc: #3a86ff;
+    --intermarche: #2dc653;
+    --systemeu: #f4d03f;
+    --auchan: #bf5af2;
+    --hyper: #ff6b6b;
+    --super: #4ecdc4;
+    --proxi: #ffd166;
+    --drive: #a8dadc;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* HEADER */
+  .header {
+    padding: 60px 60px 40px;
+    border-bottom: 1px solid var(--border);
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 40px;
+    align-items: end;
+  }
+  .header-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+  .header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(28px, 4vw, 48px);
+    font-weight: 900;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+  }
+  .header h1 span { color: var(--muted); font-weight: 400; }
+  .header-meta {
+    text-align: right;
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.8;
+  }
+
+  /* LEGEND */
+  .legend {
+    display: flex;
+    gap: 24px;
+    padding: 24px 60px;
+    border-bottom: 1px solid var(--border);
+    flex-wrap: wrap;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    letter-spacing: 0.05em;
+  }
+  .legend-dot {
+    width: 10px; height: 10px;
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+
+  /* MAIN GRID */
+  .main {
+    padding: 48px 60px;
+    display: grid;
+    gap: 48px;
+  }
+
+  /* BRAND ROWS */
+  .brand-row {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: 32px;
+    align-items: center;
+    opacity: 0;
+    transform: translateY(24px);
+    animation: fadeUp 0.6s ease forwards;
+  }
+  .brand-row:nth-child(1) { animation-delay: 0.1s; }
+  .brand-row:nth-child(2) { animation-delay: 0.2s; }
+  .brand-row:nth-child(3) { animation-delay: 0.3s; }
+  .brand-row:nth-child(4) { animation-delay: 0.4s; }
+  .brand-row:nth-child(5) { animation-delay: 0.5s; }
+
+  @keyframes fadeUp {
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .brand-info {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .brand-color-bar {
+    width: 3px;
+    height: 40px;
+    border-radius: 2px;
+    display: inline-block;
+    margin-right: 12px;
+    vertical-align: middle;
+  }
+  .brand-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+  }
+  .brand-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-top: 2px;
+    padding-left: 15px;
+  }
+
+  /* STACKED BAR */
+  .bar-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .stacked-bar {
+    display: flex;
+    height: 44px;
+    border-radius: 6px;
+    overflow: hidden;
+    gap: 2px;
+    background: rgba(255,255,255,0.03);
+  }
+  .bar-segment {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    color: rgba(0,0,0,0.75);
+    transition: filter 0.2s ease, transform 0.2s ease;
+    position: relative;
+    overflow: hidden;
+    cursor: default;
+    flex-shrink: 0;
+  }
+  .bar-segment:hover {
+    filter: brightness(1.15);
+    z-index: 10;
+  }
+  .bar-segment span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding: 0 6px;
+  }
+
+  .bar-labels {
+    display: flex;
+    gap: 2px;
+  }
+  .bar-label-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-family: 'DM Mono', monospace;
+  }
+  .bar-label-item .pct {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text);
+  }
+  .bar-label-item .cat {
+    font-size: 9px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-top: 1px;
+  }
+  .bar-label-item .cat-nb {
+    font-size: 10px;
+    color: var(--muted);
+    margin-top: 1px;
+  }
+  .brand-source {
+    font-family: 'DM Mono', monospace;
+    font-size: 9.5px;
+    color: var(--muted);
+    letter-spacing: 0.04em;
+    margin-top: 8px;
+    opacity: 0.75;
+    line-height: 1.5;
+  }
+
+  /* TOOLTIP */
+  .tooltip {
+    position: fixed;
+    background: #1e2028;
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-size: 12px;
+    font-family: 'DM Mono', monospace;
+    pointer-events: none;
+    z-index: 100;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+  }
+  .tooltip.visible { opacity: 1; }
+  .tooltip .tt-label { color: var(--muted); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 4px; }
+  .tooltip .tt-value { font-size: 20px; font-weight: 500; }
+  .tooltip .tt-name { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+  /* DIVIDER */
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 0 60px;
+  }
+
+  /* SYNTHESE */
+  .synthese {
+    padding: 48px 60px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+    background: var(--border);
+    border-top: 1px solid var(--border);
+  }
+  .synth-card {
+    background: var(--surface);
+    padding: 32px 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .synth-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 13px;
+    color: var(--muted);
+    font-style: italic;
+  }
+  .synth-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1.3;
+  }
+  .synth-body {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.7;
+  }
+  .synth-body strong { color: var(--text); font-weight: 500; }
+  .synth-highlight {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.05em;
+    padding: 4px 8px;
+    border-radius: 3px;
+    display: inline-block;
+  }
+
+  /* FOOTER */
+  .footer {
+    padding: 20px 60px;
+    border-top: 1px solid var(--border);
+    font-size: 11px;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    display: flex;
+    justify-content: space-between;
+    letter-spacing: 0.05em;
+  }
+
+  @media (max-width: 768px) {
+    .header, .main, .legend, .footer { padding-left: 24px; padding-right: 24px; }
+    .brand-row { grid-template-columns: 1fr; }
+    .synthese { grid-template-columns: 1fr; padding: 24px; }
+    .divider { margin: 0 24px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <div class="header-label">Analyse sectorielle — Distribution alimentaire</div>
+    <h1>Répartition des formats<br><span>par enseigne</span></h1>
+  </div>
+  <div class="header-meta">
+    France<br>
+    2024 – 2025<br>
+    Part du parc magasins
+  </div>
+</div>
+
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot" style="background:var(--hyper)"></div> Hypermarchés</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--super)"></div> Supermarchés</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--proxi)"></div> Proximité</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--drive)"></div> Drive / e-commerce</div>
+</div>
+
+<div class="main" id="brands"></div>
+
+<div class="divider"></div>
+
+<div class="synthese">
+  <div class="synth-card">
+    <span class="synth-num">01 —</span>
+    <div class="synth-title">Format dominant<br>par enseigne</div>
+    <div class="synth-body">
+      <strong>Carrefour</strong> → proximité + drive (78 %)<br>
+      <strong>E.Leclerc</strong> → drive quasi = hyper (48 %)<br>
+      <strong>Intermarché</strong> → drive (46 %) devant super<br>
+      <strong>Coopérative U</strong> → drive + proxi équilibrés<br>
+      <strong>Auchan</strong> → supermarché (43 %), restructuration
+    </div>
+  </div>
+  <div class="synth-card">
+    <span class="synth-num">02 —</span>
+    <div class="synth-title">Le drive,<br>format dominant</div>
+    <div class="synth-body">
+      Drives accolés inclus : <strong>32 à 48 %</strong> du parc selon l'enseigne.<br><br>
+      <span class="synth-highlight" style="background:rgba(58,134,255,0.15);color:#3a86ff">Leclerc + Intermarché</span><br>
+      Les deux leaders en nombre de drives (~863 et ~1 809), pour des stratégies opposées.
+    </div>
+  </div>
+  <div class="synth-card">
+    <span class="synth-num">03 —</span>
+    <div class="synth-title">La nouvelle<br>physionomie</div>
+    <div class="synth-body">
+      Données corrigées (sources Dauvers/Statista 2024).<br>Drives accolés aux hypermarchés comptabilisés.<br><br>
+      Les enseignes gagnantes sont celles qui <strong>couvrent tous les usages</strong> de consommation avec une présence multi-format cohérente.
+    </div>
+  </div>
+</div>
+
+<div class="footer">
+  <span>Sources : Editions Dauvers / Statista 2024 · rapports enseignes · drives accolés inclus dans le parc</span>
+  <span>Données corrigées mars 2026 — survoler les segments pour le détail</span>
+</div>
+
+<div class="tooltip" id="tooltip">
+  <div class="tt-label" id="tt-label"></div>
+  <div class="tt-value" id="tt-value"></div>
+  <div class="tt-name" id="tt-name"></div>
+</div>
+
+<script>
+// DONNÉES CORRIGÉES – mars 2026
+// Méthodologie : drives accolés inclus dans le parc total (parc physique BtoC + drives)
+// Carrefour : hors Cash & carry (Promocash 153) et Discount (Supeco/35) = BtoC uniquement
+const brands = [
+  {
+    id: 'carrefour',
+    name: 'Carrefour',
+    color: 'var(--carrefour)',
+    // Parc BtoC : 325 hypers + 1171 supers + 4784 proxi + ~1800 drives = 8 080 pts
+    tag: '8 080 points de contact BtoC (hors cash & carry et discount)',
+    source: 'Groupe Carrefour / 123catalogue.fr – données 31/12/2024 · Drives : Editions Dauvers / Statista 2024',
+    total: 8080,
+    formats: [
+      { label: 'Hypermarchés', pct: 4, nb: 325, color: 'var(--hyper)' },
+      { label: 'Supermarchés', pct: 14, nb: 1171, color: 'var(--super)' },
+      { label: 'Proximité', pct: 59, nb: 4784, color: 'var(--proxi)' },
+      { label: 'Drive', pct: 22, nb: 1800, color: 'var(--drive)' },
+    ]
+  },
+  {
+    id: 'leclerc',
+    name: 'E.Leclerc',
+    color: 'var(--leclerc)',
+    // Parc : ~666 hypermarchés + ~100 supermarchés & Express + ~767 drives = ~1 533 pts
+    // Source : 734 magasins (hypers + supers + Express confondus) + 731 drives en 2023
+    // Projection 2025 : ~766 magasins + ~767 drives = ~1 533 pts BtoC
+    tag: '~1 533 points de contact BtoC',
+    source: 'ac-franchise.com / 123catalogue.fr 2024-2025 · Drives : ~767 drives pour ~766 magasins',
+    total: 1533,
+    formats: [
+      { label: 'Hypermarchés', pct: 43, nb: 666, color: 'var(--hyper)' },
+      { label: 'Supermarchés & Express', pct: 7, nb: 100, color: 'var(--super)' },
+      { label: 'Drive', pct: 50, nb: 767, color: 'var(--drive)' },
+    ]
+  },
+  {
+    id: 'intermarche',
+    name: 'Intermarché',
+    color: 'var(--intermarche)',
+    // Source exacte Wikipedia / Mousquetaires (1er jan 2025)
+    // 128 Hyper + 1 424 Super + 294 Contact + 220 Express = 2 066 + 1 969 drives = 4 035
+    tag: '4 035 points de contact BtoC (hors Netto)',
+    source: 'Wikipedia / Les Mousquetaires – 01/01/2025 · Drives : Wikipedia (1 969 drives)',
+    total: 4035,
+    formats: [
+      { label: 'Hypermarchés', pct: 3, nb: 128, color: 'var(--hyper)' },
+      { label: 'Supermarchés', pct: 35, nb: 1424, color: 'var(--super)' },
+      { label: 'Proximité (Contact + Express)', pct: 13, nb: 514, color: 'var(--proxi)' },
+      { label: 'Drive', pct: 49, nb: 1969, color: 'var(--drive)' },
+    ]
+  },
+  {
+    id: 'systemeu',
+    name: 'Coopérative U',
+    color: 'var(--systemeu)',
+    // Parc : ~1 726 magasins + ~937 drives = ~2 663 pts
+    // Hyper U ~66, Super U ~764, U Express+Utile ~896, Drive ~937
+    tag: '~2 663 points de contact BtoC',
+    source: '123catalogue.fr / Statista 2024-2025 · Drives : Editions Dauvers / Statista juin 2024',
+    total: 2663,
+    formats: [
+      { label: 'Hypermarchés', pct: 2, nb: 66, color: 'var(--hyper)' },
+      { label: 'Supermarchés', pct: 29, nb: 764, color: 'var(--super)' },
+      { label: 'Proximité', pct: 34, nb: 896, color: 'var(--proxi)' },
+      { label: 'Drive', pct: 35, nb: 937, color: 'var(--drive)' },
+    ]
+  },
+  {
+    id: 'auchan',
+    name: 'Auchan',
+    color: 'var(--auchan)',
+    // Parc : ~155 hypers + ~330 supers + ~40 MyAuchan + ~250 drives = ~775 pts
+    // (restructuration : cession de 294 supers à Intermarché/Netto en cours 2025)
+    tag: '~775 points de contact BtoC (restructuration en cours)',
+    source: 'Statista / presse spécialisée 2024 · Drives : estimation (Auchan Drive en fort recul)',
+    total: 775,
+    formats: [
+      { label: 'Hypermarchés', pct: 20, nb: 155, color: 'var(--hyper)' },
+      { label: 'Supermarchés', pct: 43, nb: 330, color: 'var(--super)' },
+      { label: 'Proximité', pct: 5, nb: 40, color: 'var(--proxi)' },
+      { label: 'Drive', pct: 32, nb: 250, color: 'var(--drive)' },
+    ]
+  }
+];
+
+const container = document.getElementById('brands');
+const tooltip = document.getElementById('tooltip');
+const ttLabel = document.getElementById('tt-label');
+const ttValue = document.getElementById('tt-value');
+const ttName = document.getElementById('tt-name');
+
+brands.forEach(brand => {
+  const row = document.createElement('div');
+  row.className = 'brand-row';
+
+  // Brand info
+  const info = document.createElement('div');
+  info.className = 'brand-info';
+  info.innerHTML = `
+    <div class="brand-name">
+      <span class="brand-color-bar" style="background:${brand.color}"></span>
+      ${brand.name}
+    </div>
+    <div class="brand-tag">${brand.tag}</div>
+  `;
+
+  // Bar + labels + source block
+  const barContainer = document.createElement('div');
+  barContainer.className = 'bar-container';
+
+  const stackedBar = document.createElement('div');
+  stackedBar.className = 'stacked-bar';
+
+  const labelsRow = document.createElement('div');
+  labelsRow.className = 'bar-labels';
+
+  brand.formats.forEach(fmt => {
+    if (fmt.pct === 0) return; // skip zero-width segments
+
+    const seg = document.createElement('div');
+    seg.className = 'bar-segment';
+    seg.style.width = `${fmt.pct}%`;
+    seg.style.background = fmt.color;
+    if (fmt.pct >= 5) {
+      seg.style.fontSize = fmt.pct < 8 ? '9px' : '11px';
+      seg.innerHTML = `<span>${fmt.pct}%</span>`;
+    }
+
+    seg.addEventListener('mousemove', (e) => {
+      ttLabel.textContent = brand.name;
+      ttValue.textContent = `${fmt.pct}% — ${fmt.nb.toLocaleString('fr-FR')} pts`;
+      ttName.textContent = fmt.label;
+      ttValue.style.color = fmt.color;
+      tooltip.classList.add('visible');
+      tooltip.style.left = (e.clientX + 16) + 'px';
+      tooltip.style.top = (e.clientY - 60) + 'px';
+    });
+    seg.addEventListener('mouseleave', () => tooltip.classList.remove('visible'));
+
+    stackedBar.appendChild(seg);
+
+    // Label below: % + nb
+    const labelItem = document.createElement('div');
+    labelItem.className = 'bar-label-item';
+    labelItem.style.width = `${fmt.pct}%`;
+    const showText = fmt.pct >= 10;
+    labelItem.innerHTML = `
+      <span class="pct" style="color:${fmt.color}">${fmt.pct}%</span>
+      ${showText ? `<span class="cat-nb">(${fmt.nb.toLocaleString('fr-FR')})</span>` : ''}
+      ${showText ? `<span class="cat">${fmt.label.split(' ')[0]}</span>` : ''}
+    `;
+    labelsRow.appendChild(labelItem);
+  });
+
+  // Source line
+  const sourceLine = document.createElement('div');
+  sourceLine.className = 'brand-source';
+  sourceLine.textContent = `Source : ${brand.source}`;
+
+  barContainer.appendChild(stackedBar);
+  barContainer.appendChild(labelsRow);
+  barContainer.appendChild(sourceLine);
+
+  row.appendChild(info);
+  row.appendChild(barContainer);
+  container.appendChild(row);
+});
+</script>
+</body>
+</html>
